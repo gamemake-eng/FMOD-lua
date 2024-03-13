@@ -16,6 +16,9 @@ now you can include it in your projects!
 ```lua
 -- NOTE: Make sure to include fmod.dll IN THE DIRECTORY OF THE EXE (where love, GXE, lua, etc is installed)
 local fmod = require("fmodlua")
+fmod.Init()
+fmod.Play("music.wav")
+fmod.Release()
 ```
 
 You are free to contribute!
