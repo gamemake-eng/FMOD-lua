@@ -34,4 +34,4 @@
 doxygen/html/*
 
 *.sublime-project
-*.sublime-workspace
+*.sublime-workspace*.zip
