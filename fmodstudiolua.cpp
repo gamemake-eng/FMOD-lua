@@ -128,6 +128,77 @@ static int l_oneshot(lua_State* L)
 	}
 	return 1;
 }
+static int l_loadevent(lua_State* L)
+{
+	FMOD_STUDIO_EVENTDESCRIPTION* ed = NULL;
+	const char* event = luaL_checkstring(L, 1);
+	const char* id = luaL_checkstring(L, 2);
+
+	result = FMOD_Studio_System_GetEvent(studiosystem, event, &ed);
+
+	if (result != FMOD_OK)
+    {
+        printf("FMOD error! (%d) %s\n", result, FMOD_ErrorString(result));
+        
+    }
+
+    if (ed)
+	{
+		FMOD_STUDIO_EVENTINSTANCE* ei = NULL;
+		FMOD_Studio_EventDescription_CreateInstance(ed, &ei);
+		
+		if (ei)
+		{
+			instances.emplace(id, ei);
+			/*FMOD_Studio_EventInstance_Start(ei);
+			FMOD_Studio_EventInstance_Release(ei);*/
+		}else
+		{
+			printf("ei failed");
+		}
+	}else
+	{
+		printf("Event Desc failed");
+	}
+
+	return 1;
+}
+
+static int l_playevent(lua_State* L)
+{
+	const char* id = luaL_checkstring(L, 1);
+
+	if (instances[id])
+	{
+		FMOD_Studio_EventInstance_Start(instances[id]);
+	}
+	return 1;
+}
+
+static int l_stopevent(lua_State* L)
+{
+	const char* id = luaL_checkstring(L, 1);
+
+	if (instances[id])
+	{
+		FMOD_Studio_EventInstance_Stop(instances[id], FMOD_STUDIO_STOP_ALLOWFADEOUT);
+	}
+
+	return 1;
+}
+
+static int l_releaseevent(lua_State* L)
+{
+	const char* id = luaL_checkstring(L, 1);
+
+	if (instances[id])
+	{
+		FMOD_Studio_EventInstance_Release(instances[id]);
+	}
+
+	return 1;
+}
+
 static const struct luaL_Reg nativeFuncLib[] =
 	{
 		{"Load", l_load},
@@ -136,6 +207,10 @@ static const struct luaL_Reg nativeFuncLib[] =
 		{"LoadBank", l_loadbank},
 		{"ReleaseBank", l_releasebank},
 		{"OneShot", l_oneshot},
+		{"LoadEvent", l_loadevent},
+		{"PlayEvent", l_playevent},
+		{"StopEvent", l_stopevent},
+		{"ReleaseEvent", l_releaseevent},
 		{NULL, NULL}
 	};
 extern "C"
